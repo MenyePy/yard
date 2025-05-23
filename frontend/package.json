@@ -12,6 +12,7 @@
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@tanstack/react-query": "^5.76.2",
+    "@types/recharts": "^2.0.1",
     "axios": "^1.6.7",
     "clsx": "^2.1.0",
     "next": "14.1.0",
@@ -20,6 +21,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
+    "recharts": "^2.15.3",
     "swiper": "^11.0.6",
     "tailwind-merge": "^2.2.1",
     "zod": "^3.22.4"
