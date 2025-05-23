@@ -1,0 +1,110 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Testing
+/coverage
+.nyc_output
+
+# Next.js
+/frontend/.next/
+/frontend/out/
+/frontend/build
+/frontend/.vercel
+
+# Production
+/build
+/dist
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+*.pem
+*.sublime-workspace
+*.sublime-project
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# PWA files
+**/public/sw.js
+**/public/workbox-*.js
+**/public/worker-*.js
+**/public/sw.js.map
+**/public/workbox-*.js.map
+**/public/worker-*.js.map
+
+# Backend specific
+/backend/logs/
+/backend/uploads/
+/backend/tmp/
+/backend/.env
+/backend/.env.*
+/backend/dist/
+/backend/coverage/
+
+# Cache
+.cache/
+.parcel-cache/
+.npm
+.eslintcache
+.stylelintcache
+
+# Misc
+.DS_Store
+*.pem
+.vercel
+.turbo
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.vscode-test
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Optional: Uncomment if using Storybook
+# storybook-static/
+
+# Optional: Uncomment if using Cypress
+# cypress/videos/
+# cypress/screenshots/
+
+# Optional: Uncomment if using Playwright
+# test-results/
+# playwright-report/
+# playwright/.cache/
+
+# Optional: Uncomment if using Jest
+# /coverage
+# /.nyc_output
+
+# Optional: Uncomment if using Docusaurus
+# /website/build/
+# /website/node_modules/
+# /website/i18n/*/docusaurus-plugin-content-docs/current/
+# /website/yarn-error.log
+# /website/yarn-debug.log* 
