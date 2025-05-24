@@ -23,6 +23,9 @@ module.exports = {
           950: '#082f49',
         },
       },
+      borderColor: {
+        border: 'hsl(var(--border) / <alpha-value>)',
+      },
       fontFamily: {
         sans: ['var(--font-inter)'],
       },
@@ -43,4 +46,4 @@ module.exports = {
     },
   },
   plugins: [],
-} 
+}
