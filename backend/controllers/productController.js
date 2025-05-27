@@ -3,8 +3,13 @@ const { validationResult } = require('express-validator');
 
 exports.getAllProducts = async (req, res) => {
   try {
-    const { sort, category } = req.query;
-    const query = { reserved: false };
+    const { sort, category, includeReserved } = req.query;
+    const query = {};
+    
+    // Only filter by reserved status if not admin or not explicitly requesting reserved items
+    if (!includeReserved) {
+      query.reserved = false;
+    }
     
     if (category) {
       query.category = category;

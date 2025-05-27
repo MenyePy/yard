@@ -16,7 +16,7 @@ export const handleApiError = (error: unknown): string => {
 };
 
 // Create axios instance with base URL
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_URL,
 });
 
@@ -29,11 +29,11 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export const productsApi = {
-  getAll: async (sort?: string, category?: string) => {
+export const productsApi = {  getAll: async (sort?: string, category?: string, includeReserved?: boolean) => {
     const params = new URLSearchParams();
     if (sort) params.append('sort', sort);
     if (category) params.append('category', category);
+    if (includeReserved) params.append('includeReserved', 'true');
     const response = await api.get<Product[]>(`/products?${params}`);
     return response.data;
   },

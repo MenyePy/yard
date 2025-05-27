@@ -32,4 +32,10 @@ router.post('/change-password',
   adminController.changePassword
 );
 
+// Verify token
+router.get('/verify',
+  auth,
+  adminController.verifyToken
+);
+
 module.exports = router;

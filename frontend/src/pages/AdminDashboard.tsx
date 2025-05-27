@@ -7,8 +7,7 @@ const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [formData, setFormData] = useState({
+  const [error, setError] = useState('');  const [formData, setFormData] = useState({
     name: '',
     description: '',
     category: 'clothing',
@@ -17,15 +16,16 @@ const AdminDashboard: React.FC = () => {
   });
   const [images, setImages] = useState<FileList | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showReserved, setShowReserved] = useState(false);
 
   useEffect(() => {
     fetchProducts();
   }, []);
-
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const data = await productsApi.getAll();
+      // Get all products for admin, including reserved ones
+      const data = await productsApi.getAll(undefined, undefined, true);
       setProducts(data);
     } catch (err) {
       setError(handleApiError(err));
@@ -232,15 +232,25 @@ const AdminDashboard: React.FC = () => {
             {submitting ? 'Creating...' : 'Create Product'}
           </button>
         </form>
-      </div>
-
-      <div className="card">
-        <h2 className="text-2xl font-bold mb-6">Manage Products</h2>
+      </div>      <div className="card">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Manage Products</h2>
+          <div className="flex items-center space-x-2">
+            <label className="inline-flex items-center">
+              <input
+                type="checkbox"
+                checked={showReserved}
+                onChange={(e) => setShowReserved(e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              />
+              <span className="ml-2 text-sm text-gray-700">Show Reserved Only</span>
+            </label>
+          </div>
+        </div>
         
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
+            <thead className="bg-gray-50">              <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Product
                 </th>
@@ -253,13 +263,17 @@ const AdminDashboard: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Reserved By
+                </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {products.map((product) => (
+            </thead>            <tbody className="bg-white divide-y divide-gray-200">
+              {products
+                .filter(product => showReserved ? product.reserved : true)
+                .map((product) => (
                 <tr key={product._id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -294,14 +308,43 @@ const AdminDashboard: React.FC = () => {
                     }`}>
                       {product.reserved ? 'Reserved' : 'Available'}
                     </span>
-                  </td>                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end space-x-4">
+                  </td>                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="text-sm text-gray-900">
+                      {product.reservedBy ? (
+                        <>
+                          <span>{product.reservedBy.phoneNumber}</span>
+                          <br />
+                          <span className="text-xs text-gray-500">
+                            {new Date(product.reservedBy.reservedAt).toLocaleDateString()}
+                          </span>
+                        </>
+                      ) : (
+                        '-'
+                      )}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">                    <div className="flex justify-end space-x-4">
                       <button
                         onClick={() => navigate(`/products/${product._id}/edit`)}
                         className="text-blue-600 hover:text-blue-900"
                       >
                         Edit
                       </button>
+                      {product.reserved && (
+                        <button
+                          onClick={async () => {
+                            try {
+                              await productsApi.unreserve(product._id);
+                              fetchProducts();
+                            } catch (err) {
+                              setError(handleApiError(err));
+                            }
+                          }}
+                          className="text-yellow-600 hover:text-yellow-900"
+                        >
+                          Unreserve
+                        </button>
+                      )}
                       <button
                         onClick={() => handleDelete(product._id)}
                         className="text-red-600 hover:text-red-900"

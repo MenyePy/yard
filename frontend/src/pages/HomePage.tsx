@@ -77,31 +77,31 @@ const HomePage: React.FC = () => {
           No products available
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {products.map((product) => (
             <Link
               key={product._id}
               to={`/products/${product._id}`}
               className="card hover:shadow-lg transition-shadow duration-200"
             >
-              <div className="aspect-w-16 aspect-h-9 mb-4">
+              <div className="aspect-w-16 aspect-h-9 mb-2 sm:mb-4">
                 <img
                   src={product.images[0]}
                   alt={product.name}
-                  className="object-cover w-full h-48 rounded-md"
+                  className="object-cover w-full h-32 sm:h-48 rounded-md"
                 />
               </div>
               
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              <h2 className="text-base sm:text-xl font-semibold text-gray-900 mb-1 sm:mb-2 line-clamp-2">
                 {product.name}
               </h2>
               
               <div className="flex justify-between items-center">
-                <span className="text-lg font-medium text-gray-900">
+                <span className="text-sm sm:text-lg font-medium text-gray-900">
                   MWK {product.price.toLocaleString()}
                 </span>
                 <span className="text-sm text-gray-500">
-                  {product.category}
+                  {product.category.toLocaleUpperCase() || 'Uncategorized'}
                 </span>
               </div>
               

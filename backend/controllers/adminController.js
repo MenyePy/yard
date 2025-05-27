@@ -94,3 +94,8 @@ exports.changePassword = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+exports.verifyToken = async (req, res) => {
+  // If the request made it past the auth middleware, the token is valid
+  res.json({ valid: true });
+};
