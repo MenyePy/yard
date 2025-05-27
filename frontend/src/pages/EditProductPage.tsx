@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { productsApi, handleApiError } from '../services/api';
-import { Product } from '../types';
+import { Product, ProductCategory } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 
 const EditProductPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  
-  const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState({
     name: '',
     description: '',
-    category: 'clothing',
+    category: 'clothing' as ProductCategory,
     price: '',
     contactNumber: '',
   });
@@ -63,12 +62,10 @@ const EditProductPage: React.FC = () => {
 
     try {
       setSubmitting(true);
-      setError('');
-
-      await productsApi.update(id!, {
+      setError('');      await productsApi.update(id!, {
         name: formData.name,
         description: formData.description,
-        category: formData.category,
+        category: formData.category as ProductCategory,
         price: parseFloat(formData.price),
         contactNumber: formData.contactNumber,
       });

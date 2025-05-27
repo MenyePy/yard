@@ -1,8 +1,10 @@
+export type ProductCategory = 'clothing' | 'technology' | 'other';
+
 export interface Product {
   _id: string;
   name: string;
   description?: string;
-  category: 'clothing' | 'technology' | 'other';
+  category: ProductCategory;
   price: number;
   images: string[];
   contactNumber: string;

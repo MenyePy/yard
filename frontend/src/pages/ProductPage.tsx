@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { productsApi, handleApiError } from '../services/api';
 import { Product } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import ImageModal from '../components/ImageModal';
 
 const ProductPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,8 +16,9 @@ const ProductPage: React.FC = () => {
   
   // Form states
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [offerPrice, setOfferPrice] = useState('');
-  const [submitting, setSubmitting] = useState(false);
+  const [offerPrice, setOfferPrice] = useState('');  const [submitting, setSubmitting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   const fetchProduct = useCallback(async () => {
     try {
@@ -114,28 +116,54 @@ const ProductPage: React.FC = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      {/* Image Gallery */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">      {/* Image Gallery */}
       <div className="space-y-4">
-        <div className="aspect-w-16 aspect-h-9">
+        <div 
+          className="aspect-w-16 aspect-h-9 cursor-pointer"
+          onClick={() => {
+            setCurrentImageIndex(0);
+            setIsModalOpen(true);
+          }}
+        >
           <img
             src={product.images[0]}
             alt={product.name}
-            className="object-cover w-full h-96 rounded-lg"
+            className="object-cover w-full h-96 rounded-lg hover:opacity-90 transition-opacity"
           />
         </div>
         {product.images.length > 1 && (
           <div className="grid grid-cols-4 gap-2">
             {product.images.slice(1).map((image, index) => (
-              <img
+              <div
                 key={index}
-                src={image}
-                alt={`${product.name} ${index + 2}`}
-                className="object-cover w-full h-24 rounded-md"
-              />
+                className="cursor-pointer"
+                onClick={() => {
+                  setCurrentImageIndex(index + 1);
+                  setIsModalOpen(true);
+                }}
+              >
+                <img
+                  src={image}
+                  alt={`${product.name} ${index + 2}`}
+                  className="object-cover w-full h-24 rounded-md hover:opacity-90 transition-opacity"
+                />
+              </div>
             ))}
           </div>
         )}
+
+        <ImageModal
+          images={product.images}
+          currentIndex={currentImageIndex}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onNext={() => setCurrentImageIndex(prev => 
+            prev < product.images.length - 1 ? prev + 1 : prev
+          )}
+          onPrev={() => setCurrentImageIndex(prev => 
+            prev > 0 ? prev - 1 : prev
+          )}
+        />
       </div>
 
       {/* Product Details */}
@@ -262,7 +290,7 @@ const ProductPage: React.FC = () => {
             <button
               onClick={() => navigate(`/products/${product._id}/edit`)}
               disabled={submitting}
-              className="btn-secondary"
+              className="btn-primary"
             >
               Edit Product
             </button>
