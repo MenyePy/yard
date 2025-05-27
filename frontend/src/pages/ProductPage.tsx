@@ -20,7 +20,14 @@ const ProductPage: React.FC = () => {
   const [offerPrice, setOfferPrice] = useState('');  const [submitting, setSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
+
+  useEffect(() => {
+    // Set the initial image index to the cover image when product loads
+    if (product) {
+      setCurrentImageIndex(product.coverImageIndex);
+    }
+  }, [product]);
+
   const fetchProduct = useCallback(async () => {
     try {
       setLoading(true);
@@ -98,6 +105,11 @@ const ProductPage: React.FC = () => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const openModal = (index: number) => {
+    setCurrentImageIndex(index);
+    setIsModalOpen(true);
   };
 
   if (loading) {

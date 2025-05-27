@@ -1,6 +1,38 @@
 const Product = require('../models/Product');
 const { validationResult } = require('express-validator');
 
+exports.searchProducts = async (req, res) => {
+  try {
+    const { query } = req.query;
+    
+    // Search in product name and description
+    const searchResults = await Product.find({
+      $or: [
+        { name: { $regex: query, $options: 'i' } },
+        { description: { $regex: query, $options: 'i' } }
+      ],
+      reserved: false
+    }).limit(10);
+
+    // Get categories from search results
+    const categories = [...new Set(searchResults.map(product => product.category))];
+    
+    // Find similar products from the same categories
+    const similarProducts = await Product.find({
+      category: { $in: categories },
+      _id: { $nin: searchResults.map(p => p._id) },
+      reserved: false
+    }).limit(6);
+
+    res.json({
+      searchResults,
+      similarProducts
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 exports.getAllProducts = async (req, res) => {
   try {
     const { sort, category, includeReserved } = req.query;
@@ -41,16 +73,58 @@ exports.getProduct = async (req, res) => {
   }
 };
 
+exports.updateProduct = async (req, res) => {
+  try {
+    const updates = { ...req.body };
+    
+    // Validate coverImageIndex if it's being updated
+    if ('coverImageIndex' in updates) {
+      const product = await Product.findById(req.params.id);
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      
+      // Ensure coverImageIndex is valid
+      if (updates.coverImageIndex < 0 || updates.coverImageIndex >= product.images.length) {
+        return res.status(400).json({ error: 'Invalid cover image index' });
+      }
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      updates,
+      { new: true, runValidators: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    res.json(product);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 exports.createProduct = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  try {    const images = req.files.map(file => file.path); // Cloudinary returns URL in file.path
+  try {
+    const images = req.files.map(file => file.path);
+    const coverImageIndex = req.body.coverImageIndex || 0;
+    
+    // Validate coverImageIndex
+    if (coverImageIndex < 0 || coverImageIndex >= images.length) {
+      return res.status(400).json({ error: 'Invalid cover image index' });
+    }
+    
     const product = new Product({
       ...req.body,
       images,
+      coverImageIndex,
       price: parseFloat(req.body.price) // Ensure price is stored as a number
     });
     await product.save();
@@ -137,19 +211,21 @@ exports.deleteProduct = async (req, res) => {
 };
 
 exports.updateProduct = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
   try {
-    const updates = {
-      ...(req.body.name && { name: req.body.name }),
-      ...(req.body.description !== undefined && { description: req.body.description }),
-      ...(req.body.category && { category: req.body.category }),
-      ...(req.body.price && { price: parseFloat(req.body.price) }),
-      ...(req.body.contactNumber && { contactNumber: req.body.contactNumber })
-    };
+    const updates = { ...req.body };
+    
+    // Validate coverImageIndex if it's being updated
+    if ('coverImageIndex' in updates) {
+      const product = await Product.findById(req.params.id);
+      if (!product) {
+        return res.status(404).json({ error: 'Product not found' });
+      }
+      
+      // Ensure coverImageIndex is valid
+      if (updates.coverImageIndex < 0 || updates.coverImageIndex >= product.images.length) {
+        return res.status(400).json({ error: 'Invalid cover image index' });
+      }
+    }
 
     const product = await Product.findByIdAndUpdate(
       req.params.id,

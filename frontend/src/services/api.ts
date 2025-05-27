@@ -29,7 +29,18 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export const productsApi = {  getAll: async (sort?: string, category?: string, includeReserved?: boolean) => {
+interface SearchResponse {
+  searchResults: Product[];
+  similarProducts: Product[];
+}
+
+export const productsApi = {
+  search: async (query: string) => {
+    const response = await api.get<SearchResponse>(`/products/search?query=${encodeURIComponent(query)}`);
+    return response.data;
+  },
+
+  getAll: async (sort?: string, category?: string, includeReserved?: boolean) => {
     const params = new URLSearchParams();
     if (sort) params.append('sort', sort);
     if (category) params.append('category', category);
@@ -66,7 +77,7 @@ export const productsApi = {  getAll: async (sort?: string, category?: string, i
     await api.delete(`/products/${id}`);
   },
 
-  update: async (id: string, data: Omit<Partial<Product>, 'images' | '_id'>) => {
+  update: async (id: string, data: Partial<Omit<Product, '_id' | 'images' | 'reserved' | 'reservedBy' | 'offers' | 'createdAt' | 'updatedAt'>> & { coverImageIndex?: number }) => {
     const response = await api.put<Product>(`/products/${id}`, data);
     return response.data;
   },

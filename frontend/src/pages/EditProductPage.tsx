@@ -3,18 +3,20 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { productsApi, handleApiError } from '../services/api';
 import { Product, ProductCategory } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import { categories, getCategoryLabel } from '../utils/categoryUtils';
 
 const EditProductPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-    const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     name: '',
     description: '',
     category: 'clothing' as ProductCategory,
     price: '',
     contactNumber: '',
   });
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -31,13 +33,14 @@ const EditProductPage: React.FC = () => {
     const fetchProduct = async () => {
       try {
         if (!id) return;
-        const product = await productsApi.getById(id);
+        const productData = await productsApi.getById(id);
+        setProduct(productData);
         setFormData({
-          name: product.name,
-          description: product.description || '',
-          category: product.category,
-          price: product.price.toString(),
-          contactNumber: product.contactNumber,
+          name: productData.name,
+          description: productData.description || '',
+          category: productData.category,
+          price: productData.price.toString(),
+          contactNumber: productData.contactNumber,
         });
         setLoading(false);
       } catch (err) {
@@ -62,7 +65,8 @@ const EditProductPage: React.FC = () => {
 
     try {
       setSubmitting(true);
-      setError('');      await productsApi.update(id!, {
+      setError('');
+      await productsApi.update(id!, {
         name: formData.name,
         description: formData.description,
         category: formData.category as ProductCategory,
@@ -71,6 +75,20 @@ const EditProductPage: React.FC = () => {
       });
       
       navigate(`/products/${id}`);
+    } catch (err) {
+      setError(handleApiError(err));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSetCoverImage = async (index: number) => {
+    if (!product || !id) return;
+    
+    try {
+      setSubmitting(true);
+      await productsApi.update(id, { coverImageIndex: index });
+      setProduct({ ...product, coverImageIndex: index });
     } catch (err) {
       setError(handleApiError(err));
     } finally {
@@ -94,6 +112,41 @@ const EditProductPage: React.FC = () => {
         {error && (
           <div className="mb-4 p-3 text-red-700 bg-red-100 rounded">
             {error}
+          </div>
+        )}
+
+        {product && (
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Product Images
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {product.images.map((image, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={image}
+                    alt={`Product ${index + 1}`}
+                    className={`w-full h-32 object-cover rounded-lg ${
+                      index === product.coverImageIndex ? 'ring-2 ring-blue-500' : ''
+                    }`}
+                  />
+                  {index !== product.coverImageIndex && (
+                    <button
+                      type="button"
+                      onClick={() => handleSetCoverImage(index)}
+                      className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 rounded-lg transition-opacity"
+                    >
+                      Set as Cover
+                    </button>
+                  )}
+                  {index === product.coverImageIndex && (
+                    <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                      Cover
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -139,9 +192,11 @@ const EditProductPage: React.FC = () => {
               className="mt-1 input-field"
               required
             >
-              <option value="clothing">Clothing</option>
-              <option value="technology">Technology</option>
-              <option value="other">Other</option>
+              {categories.map(cat => (
+                <option key={cat} value={cat}>
+                  {getCategoryLabel(cat)}
+                </option>
+              ))}
             </select>
           </div>
 

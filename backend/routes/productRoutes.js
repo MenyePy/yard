@@ -8,6 +8,7 @@ const upload = require('../middleware/upload');
 // Public routes
 router.get('/', productController.getAllProducts);
 router.get('/:id', productController.getProduct);
+router.get('/search', productController.searchProducts);
 
 // Reserve product
 router.post('/:id/reserve',

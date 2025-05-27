@@ -9,11 +9,10 @@ const productSchema = new mongoose.Schema({
   description: {
     type: String,
     trim: true
-  },
-  category: {
+  },  category: {
     type: String,
     required: true,
-    enum: ['clothing', 'technology', 'other'] // Add more categories as needed
+    enum: ['clothing', 'electronics', 'home-and-kitchen', 'health', 'outdoors', 'stationery', 'toys-and-games', 'automotive', 'other']
   },
   price: {
     type: Number,
@@ -30,6 +29,16 @@ const productSchema = new mongoose.Schema({
         message: 'Product must have between 1 and 5 images'
       }
     ]
+  },
+  coverImageIndex: {
+    type: Number,
+    default: 0,
+    validate: {
+      validator: function(v) {
+        return v >= 0 && v < this.images.length;
+      },
+      message: 'Cover image index must be valid'
+    }
   },
   contactNumber: {
     type: String,

@@ -1,4 +1,13 @@
-export type ProductCategory = 'clothing' | 'technology' | 'other';
+export type ProductCategory = 
+  | 'clothing'
+  | 'electronics'
+  | 'home-and-kitchen'
+  | 'health'
+  | 'outdoors'
+  | 'stationery'
+  | 'toys-and-games'
+  | 'automotive'
+  | 'other';
 
 export interface Product {
   _id: string;
@@ -7,6 +16,7 @@ export interface Product {
   category: ProductCategory;
   price: number;
   images: string[];
+  coverImageIndex: number;
   contactNumber: string;
   reserved: boolean;
   reservedBy?: {
