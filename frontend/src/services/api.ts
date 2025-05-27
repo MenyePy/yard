@@ -62,9 +62,13 @@ export const productsApi = {
     const response = await api.post<Product>(`/products/${id}/offer`, { phoneNumber, offerPrice });
     return response.data;
   },
-
   delete: async (id: string) => {
     await api.delete(`/products/${id}`);
+  },
+
+  update: async (id: string, data: Omit<Partial<Product>, 'images' | '_id'>) => {
+    const response = await api.put<Product>(`/products/${id}`, data);
+    return response.data;
   },
 };
 

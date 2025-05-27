@@ -45,9 +45,8 @@ const HomePage: React.FC = () => {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
-          Available Products
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6">        <h1 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
+          Welcome to Afonne Market
         </h1>
         
         <div className="flex flex-col sm:flex-row gap-4">

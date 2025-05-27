@@ -256,11 +256,16 @@ const ProductPage: React.FC = () => {
               ))}
             </div>
           </div>
-        )}
-
-        {/* Admin Actions */}
+        )}        {/* Admin Actions */}
         {isAuthenticated && (
           <div className="flex justify-end space-x-4">
+            <button
+              onClick={() => navigate(`/products/${product._id}/edit`)}
+              disabled={submitting}
+              className="btn-secondary"
+            >
+              Edit Product
+            </button>
             <button
               onClick={handleDelete}
               disabled={submitting}

@@ -6,6 +6,8 @@ import HomePage from './pages/HomePage';
 import ProductPage from './pages/ProductPage';
 import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
+import CreateAdminPage from './pages/CreateAdminPage';
+import EditProductPage from './pages/EditProductPage';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -22,13 +24,27 @@ const AppRoutes: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route path="/products/:id" element={<ProductPage />} />
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/products/:id" element={<ProductPage />} />      <Route path="/login" element={<LoginPage />} />
       <Route
         path="/admin"
         element={
           <ProtectedRoute>
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />      <Route
+        path="/admin/create"
+        element={
+          <ProtectedRoute>
+            <CreateAdminPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/products/:id/edit"
+        element={
+          <ProtectedRoute>
+            <EditProductPage />
           </ProtectedRoute>
         }
       />

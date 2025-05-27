@@ -130,3 +130,34 @@ exports.deleteProduct = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+exports.updateProduct = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const updates = {
+      ...(req.body.name && { name: req.body.name }),
+      ...(req.body.description !== undefined && { description: req.body.description }),
+      ...(req.body.category && { category: req.body.category }),
+      ...(req.body.price && { price: parseFloat(req.body.price) }),
+      ...(req.body.contactNumber && { contactNumber: req.body.contactNumber })
+    };
+
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      updates,
+      { new: true, runValidators: true }
+    );
+
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    res.json(product);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};

@@ -47,4 +47,16 @@ router.delete('/:id',
   productController.deleteProduct
 );
 
+router.put('/:id',
+  auth,
+  [
+    body('name').optional().notEmpty().trim(),
+    body('category').optional().isIn(['clothing', 'technology', 'other']),
+    body('price').optional().isNumeric().toFloat(),
+    body('contactNumber').optional().notEmpty().trim(),
+    body('description').optional().trim()
+  ],
+  productController.updateProduct
+);
+
 module.exports = router;

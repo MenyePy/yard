@@ -11,10 +11,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <nav className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex">
-              <Link to="/" className="flex items-center">
+            <div className="flex">              <Link to="/" className="flex items-center">
                 <span className="text-xl font-semibold text-gray-800">
-                  Product Management
+                  Afonne Market
                 </span>
               </Link>
               
@@ -75,9 +74,8 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </main>
 
       <footer className="bg-white border-t">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-gray-500 text-sm">
-            © {new Date().getFullYear()} Product Management. All rights reserved.
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">          <p className="text-center text-gray-500 text-sm">
+            © {new Date().getFullYear()} Afonne Market. All rights reserved.
           </p>
         </div>
       </footer>
