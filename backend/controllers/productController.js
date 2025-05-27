@@ -117,12 +117,18 @@ exports.createProduct = async (req, res) => {
     if (coverImageIndex < 0 || coverImageIndex >= images.length) {
       return res.status(400).json({ error: 'Invalid cover image index' });
     }
-    
+      // Validate category
+    const { category } = req.body;
+    if (!category || !Product.schema.path('category').enumValues.includes(category)) {
+      return res.status(400).json({ error: 'Invalid category value' });
+    }
+
     const product = new Product({
       ...req.body,
       images,
       coverImageIndex,
-      price: parseFloat(req.body.price) // Ensure price is stored as a number
+      price: parseFloat(req.body.price), // Ensure price is stored as a number
+      category // Ensure category is explicitly set
     });
     await product.save();
     res.status(201).json(product);

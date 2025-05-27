@@ -34,13 +34,22 @@ const AdminDashboard: React.FC = () => {
       setLoading(false);
     }
   };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    if (name === 'category') {
+      // Validate that the value is a valid ProductCategory
+      if (categories.includes(value as ProductCategory)) {
+        setFormData(prev => ({
+          ...prev,
+          category: value as ProductCategory
+        }));
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
