@@ -29,12 +29,13 @@ const productSchema = new mongoose.Schema({
         message: 'Product must have between 1 and 5 images'
       }
     ]
-  },
-  coverImageIndex: {
+  },  coverImageIndex: {
     type: Number,
     default: 0,
     validate: {
       validator: function(v) {
+        // Handle the case where images might not be loaded yet during validation
+        if (!this.images) return v === 0;
         return v >= 0 && v < this.images.length;
       },
       message: 'Cover image index must be valid'

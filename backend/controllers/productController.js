@@ -75,32 +75,29 @@ exports.getProduct = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
   try {
+    // First get the current product
+    const currentProduct = await Product.findById(req.params.id);
+    if (!currentProduct) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
     const updates = { ...req.body };
     
-    // Validate coverImageIndex if it's being updated
+    // Special handling for coverImageIndex
     if ('coverImageIndex' in updates) {
-      const product = await Product.findById(req.params.id);
-      if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
-      }
-      
       // Ensure coverImageIndex is valid
-      if (updates.coverImageIndex < 0 || updates.coverImageIndex >= product.images.length) {
+      if (typeof updates.coverImageIndex !== 'number' || 
+          updates.coverImageIndex < 0 || 
+          updates.coverImageIndex >= currentProduct.images.length) {
         return res.status(400).json({ error: 'Invalid cover image index' });
       }
     }
 
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      updates,
-      { new: true, runValidators: true }
-    );
+    // Apply updates
+    Object.assign(currentProduct, updates);
+    await currentProduct.save(); // This will run the validators
 
-    if (!product) {
-      return res.status(404).json({ error: 'Product not found' });
-    }
-
-    res.json(product);
+    res.json(currentProduct);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -207,38 +204,5 @@ exports.deleteProduct = async (req, res) => {
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
-  }
-};
-
-exports.updateProduct = async (req, res) => {
-  try {
-    const updates = { ...req.body };
-    
-    // Validate coverImageIndex if it's being updated
-    if ('coverImageIndex' in updates) {
-      const product = await Product.findById(req.params.id);
-      if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
-      }
-      
-      // Ensure coverImageIndex is valid
-      if (updates.coverImageIndex < 0 || updates.coverImageIndex >= product.images.length) {
-        return res.status(400).json({ error: 'Invalid cover image index' });
-      }
-    }
-
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      updates,
-      { new: true, runValidators: true }
-    );
-
-    if (!product) {
-      return res.status(404).json({ error: 'Product not found' });
-    }
-
-    res.json(product);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
   }
 };
