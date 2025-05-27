@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { Product, LoginCredentials, AuthResponse, ApiError } from '../types';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://yard-lyart.vercel.app/';
+const API_URL = process.env.REACT_APP_API_URL || 'https://yard-lyart.vercel.app';
 
 // Error handling utility
 export const handleApiError = (error: unknown): string => {

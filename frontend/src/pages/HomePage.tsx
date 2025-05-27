@@ -99,7 +99,7 @@ const HomePage: React.FC = () => {
               
               <div className="flex justify-between items-center">
                 <span className="text-lg font-medium text-gray-900">
-                  ${product.price.toFixed(2)}
+                  MWK {product.price.toLocaleString()}
                 </span>
                 <span className="text-sm text-gray-500">
                   {product.category}

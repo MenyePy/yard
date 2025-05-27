@@ -139,10 +139,9 @@ const ProductPage: React.FC = () => {
       </div>
 
       {/* Product Details */}
-      <div className="space-y-6">
-        <div>
+      <div className="space-y-6">        <div>
           <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
-          <p className="mt-2 text-xl text-gray-500">${product.price.toFixed(2)}</p>
+          <p className="mt-2 text-xl text-gray-500">MWK {product.price.toLocaleString()}</p>
           <span className="mt-2 inline-block px-2 py-1 text-sm rounded-full bg-gray-100">
             {product.category}
           </span>
@@ -215,9 +214,8 @@ const ProductPage: React.FC = () => {
                   required
                 />
               </div>
-              <div>
-                <label htmlFor="offerPrice" className="block text-sm font-medium text-gray-700">
-                  Your Offer ($)
+              <div>                <label htmlFor="offerPrice" className="block text-sm font-medium text-gray-700">
+                  Your Offer (MWK)
                 </label>
                 <input
                   type="number"
@@ -253,8 +251,7 @@ const ProductPage: React.FC = () => {
                 >
                   <span className="text-gray-600">
                     {offer.phoneNumber.substring(0, 4)}****
-                  </span>
-                  <span className="font-medium">${offer.offerPrice.toFixed(2)}</span>
+                  </span>                  <span className="font-medium">MWK {offer.offerPrice.toLocaleString()}</span>
                 </div>
               ))}
             </div>

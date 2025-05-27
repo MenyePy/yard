@@ -42,11 +42,11 @@ exports.createProduct = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  try {
-    const images = req.files.map(file => `/uploads/${file.filename}`);
+  try {    const images = req.files.map(file => file.path); // Cloudinary returns URL in file.path
     const product = new Product({
       ...req.body,
-      images
+      images,
+      price: parseFloat(req.body.price) // Ensure price is stored as a number
     });
     await product.save();
     res.status(201).json(product);

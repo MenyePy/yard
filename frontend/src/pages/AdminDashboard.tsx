@@ -172,8 +172,7 @@ const AdminDashboard: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-              Price ($)
+            <label htmlFor="price" className="block text-sm font-medium text-gray-700">              Price (MWK)
             </label>
             <input
               type="number"
@@ -281,9 +280,8 @@ const AdminDashboard: React.FC = () => {
                       {product.category}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">
-                      ${product.price.toFixed(2)}
+                  <td className="px-6 py-4 whitespace-nowrap">                    <span className="text-sm text-gray-900">
+                      MWK {product.price.toLocaleString()}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
