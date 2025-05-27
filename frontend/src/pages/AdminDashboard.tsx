@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Product } from '../types';
+import { Product, ProductCategory } from '../types';
 import { productsApi, handleApiError } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import { categories, getCategoryLabel } from '../utils/categoryUtils';
 
 const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -10,7 +11,7 @@ const AdminDashboard: React.FC = () => {
   const [error, setError] = useState('');  const [formData, setFormData] = useState({
     name: '',
     description: '',
-    category: 'clothing',
+    category: categories[0] as ProductCategory,
     price: '',
     contactNumber: '',
   });
@@ -75,12 +76,11 @@ const AdminDashboard: React.FC = () => {
       }
 
       await productsApi.create(formDataToSend);
-      
-      // Reset form
+        // Reset form
       setFormData({
         name: '',
         description: '',
-        category: 'clothing',
+        category: categories[0] as ProductCategory,
         price: '',
         contactNumber: '',
       });
@@ -166,10 +166,11 @@ const AdminDashboard: React.FC = () => {
               onChange={handleInputChange}
               className="mt-1 input-field"
               required
-            >
-              <option value="clothing">Clothing</option>
-              <option value="technology">Technology</option>
-              <option value="other">Other</option>
+            >              {categories.map(cat => (
+                <option key={cat} value={cat}>
+                  {getCategoryLabel(cat)}
+                </option>
+              ))}
             </select>
           </div>
 
