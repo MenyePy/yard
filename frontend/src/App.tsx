@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import Layout from './components/Layout';
@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 import CreateAdminPage from './pages/CreateAdminPage';
 import EditProductPage from './pages/EditProductPage';
+import TermsModal from './components/TermsModal';
 
 // Protected Route component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -29,34 +30,51 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 };
 
 const AppRoutes: React.FC = () => {
+  const [showTerms, setShowTerms] = useState(false);
+
+  useEffect(() => {
+    const hasAcceptedTerms = localStorage.getItem('acceptedTerms');
+    if (!hasAcceptedTerms) {
+      setShowTerms(true);
+    }
+  }, []);
+
+  const handleAcceptTerms = () => {
+    localStorage.setItem('acceptedTerms', 'true');
+    setShowTerms(false);
+  };
+
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/products/:id" element={<ProductPage />} />      <Route path="/login" element={<LoginPage />} />
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute>
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      />      <Route
-        path="/admin/create"
-        element={
-          <ProtectedRoute>
-            <CreateAdminPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/products/:id/edit"
-        element={
-          <ProtectedRoute>
-            <EditProductPage />
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+    <>
+      <TermsModal isOpen={showTerms} onAccept={handleAcceptTerms} />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/products/:id" element={<ProductPage />} />      <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />      <Route
+          path="/admin/create"
+          element={
+            <ProtectedRoute>
+              <CreateAdminPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/products/:id/edit"
+          element={
+            <ProtectedRoute>
+              <EditProductPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </>
   );
 };
 

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { productsApi } from '../services/api';
+import { productsApi, handleApiError } from '../services/api';
 import { Product } from '../types';
 import { categories, getCategoryLabel } from '../utils/categoryUtils';
 import ProductCard from '../components/ProductCard';
-import debounce from 'lodash/debounce';
 import { Link } from 'react-router-dom';
+import { debounce } from 'lodash';
 
 const HomePage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -38,15 +38,14 @@ const HomePage: React.FC = () => {
         setSimilarProducts([]);
         setIsSearching(false);
         return;
-      }
-
-      try {
+      }      try {
         const { searchResults, similarProducts } = await productsApi.search(query);
         setSearchResults(searchResults);
         setSimilarProducts(similarProducts);
         setIsSearching(true);
+        setError('');
       } catch (err) {
-        setError('Search failed');
+        setError(handleApiError(err));
       }
     }, 300),
     []
