@@ -28,8 +28,8 @@ mongoose.connect(process.env.MONGODB_URI)
   .catch((err) => console.error('MongoDB connection error:', err));
 
 // Create first admin
-const { createFirstAdmin } = require('./controllers/adminController');
-createFirstAdmin();
+// const { createFirstAdmin } = require('./controllers/adminController');
+// createFirstAdmin();
 
 // Routes
 const productRoutes = require('./routes/productRoutes');
