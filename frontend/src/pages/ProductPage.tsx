@@ -228,9 +228,8 @@ const ProductPage: React.FC = () => {
                 </button>
               )}
             </p>
-          </div>
-        ) : (
-          {/* Buy Form */}
+          </div>        ) : (
+          /* Buy Form */
           <form onSubmit={handleReserve} className="card">
             <h3 className="text-lg font-semibold mb-4">Buy This Product</h3>
             <div className="space-y-4">
