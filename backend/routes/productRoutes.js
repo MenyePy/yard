@@ -29,9 +29,8 @@ router.post('/:id/offer',
 router.post('/',
   auth,
   upload.array('images', 5),
-  [
-    body('name').notEmpty().trim(),
-    body('category').notEmpty().isIn(['clothing', 'technology', 'other']),
+  [    body('name').notEmpty().trim(),
+    body('category').notEmpty().isIn(['clothing', 'electronics', 'home-and-kitchen', 'health', 'outdoors', 'stationery', 'toys-and-games', 'automotive', 'other']),
     body('price').isNumeric().toFloat(),
     body('contactNumber').notEmpty().trim()
   ],
@@ -50,9 +49,8 @@ router.delete('/:id',
 
 router.put('/:id',
   auth,
-  [
-    body('name').optional().notEmpty().trim(),
-    body('category').optional().isIn(['clothing', 'technology', 'other']),
+  [    body('name').optional().notEmpty().trim(),
+    body('category').optional().isIn(['clothing', 'electronics', 'home-and-kitchen', 'health', 'outdoors', 'stationery', 'toys-and-games', 'automotive', 'other']),
     body('price').optional().isNumeric().toFloat(),
     body('contactNumber').optional().notEmpty().trim(),
     body('description').optional().trim()
