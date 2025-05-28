@@ -7,6 +7,7 @@ const upload = require('../middleware/upload');
 
 // Public routes
 router.get('/', productController.getAllProducts);
+router.get('/featured', productController.getFeaturedProducts);
 router.get('/:id', productController.getProduct);
 router.get('/search', productController.searchProducts);
 
@@ -56,6 +57,22 @@ router.put('/:id',
     body('description').optional().trim()
   ],
   productController.updateProduct
+);
+
+router.post('/:id/toggle-featured',
+  auth,
+  productController.toggleFeatured
+);
+
+router.post('/:id/images',
+  auth,
+  upload.array('images', 5),
+  productController.addImages
+);
+
+router.delete('/:id/images/:imageIndex',
+  auth,
+  productController.removeImage
 );
 
 module.exports = router;

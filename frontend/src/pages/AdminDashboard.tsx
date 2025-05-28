@@ -8,7 +8,8 @@ const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');  const [formData, setFormData] = useState({
+  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({
     name: '',
     description: '',
     category: categories[0] as ProductCategory,
@@ -18,6 +19,21 @@ const AdminDashboard: React.FC = () => {
   const [images, setImages] = useState<FileList | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [showReserved, setShowReserved] = useState(false);
+  const [showOffers, setShowOffers] = useState(false);
+
+  // Get all offers from products and sort by timestamp
+  const allOffers = React.useMemo(() => {
+    return products
+      .flatMap(product => 
+        product.offers.map(offer => ({
+          ...offer,
+          productName: product.name,
+          productId: product._id,
+          productPrice: product.price
+        }))
+      )
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }, [products]);
 
   useEffect(() => {
     fetchProducts();
@@ -115,6 +131,19 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const handleToggleFeatured = async (id: string, currentlyFeatured: boolean) => {
+    try {
+      setSubmitting(true);
+      await productsApi.toggleFeatured(id);
+      await fetchProducts();
+      setError('');
+    } catch (err) {
+      setError(handleApiError(err));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -124,7 +153,7 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="card">
         <h2 className="text-2xl font-bold mb-6">Add New Product</h2>
         
@@ -242,10 +271,10 @@ const AdminDashboard: React.FC = () => {
             {submitting ? 'Creating...' : 'Create Product'}
           </button>
         </form>
-      </div>      <div className="card">
+      </div>      <div className="card mt-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Manage Products</h2>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-4">
             <label className="inline-flex items-center">
               <input
                 type="checkbox"
@@ -255,85 +284,95 @@ const AdminDashboard: React.FC = () => {
               />
               <span className="ml-2 text-sm text-gray-700">Show Reserved Only</span>
             </label>
+            <label className="inline-flex items-center">
+              <input
+                type="checkbox"
+                checked={showOffers}
+                onChange={(e) => setShowOffers(e.target.checked)}
+                className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+              />
+              <span className="ml-2 text-sm text-gray-700">Show Offers Only</span>
+            </label>
           </div>
         </div>
-        
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Product
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Price
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Reserved By
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>            <tbody className="bg-white divide-y divide-gray-200">
-              {products
-                .filter(product => showReserved ? product.reserved : true)
-                .map((product) => (
-                <tr key={product._id}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 flex-shrink-0">
-                        <img
-                          src={product.images[0]}
-                          alt={product.name}
-                          className="h-10 w-10 rounded-full object-cover"
-                        />
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {product.name}
-                        </div>
-                      </div>
+
+        {error && (
+          <div className="mb-4 p-3 text-red-700 bg-red-100 rounded">
+            {error}
+          </div>
+        )}
+
+        {showOffers ? (
+          // Offers view
+          <div className="space-y-4">
+            {allOffers.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">No offers yet</p>
+            ) : (
+              allOffers.map((offer, index) => (
+                <div key={index} className="flex items-center justify-between bg-white p-4 rounded-lg shadow border border-gray-100">
+                  <div className="flex-1">
+                    <h3 className="font-medium" onClick={() => navigate(`/products/${offer.productId}`)} style={{ cursor: 'pointer' }}>
+                      {offer.productName}
+                    </h3>
+                    <div className="text-sm text-gray-500">
+                      {offer.phoneNumber.substring(0, 4)}****
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">
-                      {product.category}
+                    <div className="text-sm text-gray-500">
+                      {new Date(offer.timestamp).toLocaleDateString()} {new Date(offer.timestamp).toLocaleTimeString()}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-medium text-lg">
+                      MWK {offer.offerPrice.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Listed: MWK {offer.productPrice.toLocaleString()}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {(offer.offerPrice / offer.productPrice * 100).toFixed(1)}% of list price
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        ) : (
+          // Products grid view
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {products.filter(p => showReserved ? p.reserved : true).map((product) => (
+              <div key={product._id} className="card">
+                <div className="relative">
+                  <img
+                    src={product.images[product.coverImageIndex]}
+                    alt={product.name}
+                    className="w-full h-48 object-cover rounded-t"
+                  />
+                  {product.featured && (
+                    <span className="absolute top-2 right-2 bg-yellow-400 text-white p-1 rounded-full">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
                     </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">                    <span className="text-sm text-gray-900">
-                      MWK {product.price.toLocaleString()}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      product.reserved
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-green-100 text-green-800'
-                    }`}>
-                      {product.reserved ? 'Reserved' : 'Available'}
-                    </span>
-                  </td>                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">
-                      {product.reservedBy ? (
-                        <>
-                          <span>{product.reservedBy.phoneNumber}</span>
-                          <br />
-                          <span className="text-xs text-gray-500">
-                            {new Date(product.reservedBy.reservedAt).toLocaleDateString()}
-                          </span>
-                        </>
-                      ) : (
-                        '-'
-                      )}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">                    <div className="flex justify-end space-x-4">
+                  )}
+                </div>
+                <div className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg font-semibold">{product.name}</h3>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleToggleFeatured(product._id, product.featured)}
+                        className={`p-1 rounded-full transition-colors ${
+                          product.featured
+                            ? 'bg-yellow-400 text-white'
+                            : 'bg-gray-200 text-gray-600 hover:bg-yellow-400 hover:text-white'
+                        }`}
+                        title={product.featured ? 'Remove from featured' : 'Add to featured'}
+                        disabled={submitting}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      </button>
                       <button
                         onClick={() => navigate(`/products/${product._id}/edit`)}
                         className="text-blue-600 hover:text-blue-900"
@@ -362,12 +401,20 @@ const AdminDashboard: React.FC = () => {
                         Delete
                       </button>
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                  <div className="text-sm text-gray-600 mb-2">{getCategoryLabel(product.category)}</div>
+                  <div className="text-lg font-bold mb-2">MWK {product.price.toLocaleString()}</div>
+                  <div className="text-sm text-gray-600">{product.contactNumber}</div>
+                  {product.reserved && (
+                    <div className="mt-2 text-sm">
+                      <span className="font-semibold">Reserved by:</span> {product.reservedBy?.phoneNumber}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -201,6 +201,40 @@ exports.makeOffer = async (req, res) => {
   }
 };
 
+exports.toggleFeatured = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    if (!product.featured) {
+      // Check if we already have 6 featured products
+      const featuredCount = await Product.countDocuments({ featured: true });
+      if (featuredCount >= 6) {
+        return res.status(400).json({ error: 'Maximum number of featured products (6) reached' });
+      }
+    }
+
+    product.featured = !product.featured;
+    await product.save();
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+exports.getFeaturedProducts = async (req, res) => {
+  try {
+    const products = await Product.find({ featured: true, reserved: false })
+      .limit(6)
+      .sort('-createdAt');
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 exports.deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
@@ -210,5 +244,66 @@ exports.deleteProduct = async (req, res) => {
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
+  }
+};
+
+exports.addImages = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    const newImages = req.files.map(file => file.path);
+    
+    // Check if total images will exceed limit
+    if (product.images.length + newImages.length > 5) {
+      return res.status(400).json({ error: 'Maximum 5 images allowed per product' });
+    }
+
+    // Add new images
+    product.images = [...product.images, ...newImages];
+    await product.save();
+    
+    res.json(product);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.removeImage = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    const imageIndex = parseInt(req.params.imageIndex);
+    
+    // Validate image index
+    if (imageIndex < 0 || imageIndex >= product.images.length) {
+      return res.status(400).json({ error: 'Invalid image index' });
+    }
+
+    // Ensure product has at least one image
+    if (product.images.length <= 1) {
+      return res.status(400).json({ error: 'Product must have at least one image' });
+    }
+
+    // Remove image from array
+    product.images.splice(imageIndex, 1);
+    
+    // If removed image was cover, reset cover to first image
+    if (product.coverImageIndex === imageIndex) {
+      product.coverImageIndex = 0;
+    } else if (product.coverImageIndex > imageIndex) {
+      // Adjust cover index if it was after the removed image
+      product.coverImageIndex--;
+    }
+
+    await product.save();
+    res.json(product);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 };

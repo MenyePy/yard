@@ -17,7 +17,8 @@ const ProductPage: React.FC = () => {
   
   // Form states
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [offerPrice, setOfferPrice] = useState('');  const [submitting, setSubmitting] = useState(false);
+  const [offerPrice, setOfferPrice] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -44,17 +45,25 @@ const ProductPage: React.FC = () => {
     if (id) {
       fetchProduct();
     }
-  }, [id, fetchProduct]);
-
-  const handleReserve = async (e: React.FormEvent) => {
+  }, [id, fetchProduct]);  const handleReserve = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!product || !phoneNumber) return;
 
     try {
-      setSubmitting(true);      await productsApi.reserve(product._id, phoneNumber);
+      setSubmitting(true);
+      await productsApi.reserve(product._id, phoneNumber);
+      
+      // Construct WhatsApp message with product name
+      const message = encodeURIComponent(`Hello! I would like to buy ${product.name} from Afonne Market.`);
+      const whatsappLink = `https://wa.me/${product.contactNumber}?text=${message}`;
+      
       await fetchProduct();
       setPhoneNumber('');
-      window.alert(`Product reserved successfully! Please contact the seller on WhatsApp to arrange payment and delivery. Click the "Contact Seller" button to start chatting.`);
+      
+      // Open WhatsApp in new tab
+      window.open(whatsappLink, '_blank');
+      
+      window.alert('Product marked as pending! We\'ve opened WhatsApp for you to contact the seller and arrange payment and delivery.');
     } catch (error) {
       setError(handleApiError(error));
     } finally {
@@ -129,7 +138,8 @@ const ProductPage: React.FC = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">      {/* Image Gallery */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* Image Gallery */}
       <div className="space-y-4">
         <div 
           className="aspect-w-16 aspect-h-9 cursor-pointer"
@@ -203,26 +213,26 @@ const ProductPage: React.FC = () => {
           <p className="text-gray-700">{product.description}</p>
         )}
 
-        {/* Reservation Status */}
+        {/* Purchase Status */}
         {product.reserved ? (
           <div className="card bg-yellow-50">
             <p className="text-yellow-800">
-              This product is currently reserved
+              This product is currently pending purchase
               {isAuthenticated && (
                 <button
                   onClick={handleUnreserve}
                   disabled={submitting}
                   className="ml-4 btn-secondary"
                 >
-                  Cancel Reservation
+                  Cancel Purchase
                 </button>
               )}
             </p>
           </div>
         ) : (
-          /* Reserve Form */
+          {/* Buy Form */}
           <form onSubmit={handleReserve} className="card">
-            <h3 className="text-lg font-semibold mb-4">Reserve This Product</h3>
+            <h3 className="text-lg font-semibold mb-4">Buy This Product</h3>
             <div className="space-y-4">
               <div>
                 <label htmlFor="reservePhone" className="block text-sm font-medium text-gray-700">
@@ -242,7 +252,7 @@ const ProductPage: React.FC = () => {
                 disabled={submitting}
                 className="w-full btn-primary"
               >
-                Reserve Now
+                Buy Now
               </button>
             </div>
           </form>

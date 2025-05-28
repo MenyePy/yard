@@ -20,6 +20,7 @@ const EditProductPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [newImages, setNewImages] = useState<FileList | null>(null);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -96,6 +97,58 @@ const EditProductPage: React.FC = () => {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const totalImages = (product?.images.length || 0) + e.target.files.length;
+      if (totalImages > 5) {
+        setError('Maximum 5 images allowed');
+        return;
+      }
+      setNewImages(e.target.files);
+    }
+  };
+
+  const handleAddImages = async () => {
+    if (!product || !newImages) return;
+
+    try {
+      setSubmitting(true);
+      setError('');
+      const updatedProduct = await productsApi.addImages(product._id, newImages);
+      setProduct(updatedProduct);
+      setNewImages(null);
+      // Reset file input
+      const fileInput = document.getElementById('new-images') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+    } catch (err) {
+      setError(handleApiError(err));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleRemoveImage = async (imageIndex: number) => {
+    if (!product || submitting) return;
+    
+    if (product.images.length <= 1) {
+      setError('Product must have at least one image');
+      return;
+    }
+
+    if (!window.confirm('Are you sure you want to remove this image?')) return;
+
+    try {
+      setSubmitting(true);
+      setError('');
+      const updatedProduct = await productsApi.removeImage(product._id, imageIndex);
+      setProduct(updatedProduct);
+    } catch (err) {
+      setError(handleApiError(err));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -117,9 +170,39 @@ const EditProductPage: React.FC = () => {
 
         {product && (
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Product Images
-            </label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Product Images ({product.images.length}/5)
+              </label>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="file"
+                  id="new-images"
+                  onChange={handleImageChange}
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  disabled={submitting}
+                />
+                <label
+                  htmlFor="new-images"
+                  className="cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                >
+                  Add Images
+                </label>
+                {newImages && (
+                  <button
+                    type="button"
+                    onClick={handleAddImages}
+                    disabled={submitting}
+                    className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                  >
+                    {submitting ? 'Uploading...' : 'Upload'}
+                  </button>
+                )}
+              </div>
+            </div>
+            
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {product.images.map((image, index) => (
                 <div key={index} className="relative group">
@@ -130,15 +213,31 @@ const EditProductPage: React.FC = () => {
                       index === product.coverImageIndex ? 'ring-2 ring-blue-500' : ''
                     }`}
                   />
-                  {index !== product.coverImageIndex && (
+                  <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center space-x-2">
+                    {index !== product.coverImageIndex && (
+                      <button
+                        type="button"
+                        onClick={() => handleSetCoverImage(index)}
+                        className="p-1 bg-blue-500 text-white rounded-full hover:bg-blue-600"
+                        title="Set as cover"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M5.5 16a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.977A4.5 4.5 0 1113.5 16h-8z" />
+                        </svg>
+                      </button>
+                    )}
                     <button
                       type="button"
-                      onClick={() => handleSetCoverImage(index)}
-                      className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 rounded-lg transition-opacity"
+                      onClick={() => handleRemoveImage(index)}
+                      className="p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      title="Remove image"
+                      disabled={product.images.length <= 1 || submitting}
                     >
-                      Set as Cover
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
                     </button>
-                  )}
+                  </div>
                   {index === product.coverImageIndex && (
                     <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded">
                       Cover

@@ -18,6 +18,7 @@ export interface Product {
   images: string[];
   coverImageIndex: number;
   contactNumber: string;
+  featured: boolean;
   reserved: boolean;
   reservedBy?: {
     phoneNumber: string;

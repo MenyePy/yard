@@ -81,6 +81,30 @@ export const productsApi = {
     const response = await api.put<Product>(`/products/${id}`, data);
     return response.data;
   },
+
+  getFeatured: async () => {
+    const response = await api.get<Product[]>('/products/featured');
+    return response.data;
+  },
+
+  toggleFeatured: async (id: string) => {
+    const response = await api.post<Product>(`/products/${id}/toggle-featured`);
+    return response.data;
+  },
+
+  addImages: async (id: string, images: FileList) => {
+    const formData = new FormData();
+    for (let i = 0; i < images.length; i++) {
+      formData.append('images', images[i]);
+    }
+    const response = await api.post<Product>(`/products/${id}/images`, formData);
+    return response.data;
+  },
+
+  removeImage: async (id: string, imageIndex: number) => {
+    const response = await api.delete<Product>(`/products/${id}/images/${imageIndex}`);
+    return response.data;
+  },
 };
 
 export const authApi = {

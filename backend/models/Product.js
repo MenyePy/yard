@@ -46,6 +46,11 @@ const productSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  featured: {
+    type: Boolean,
+    default: false,
+    index: true // Add index for better query performance
+  },
   reserved: {
     type: Boolean,
     default: false
