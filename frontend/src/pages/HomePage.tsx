@@ -4,6 +4,7 @@ import { Product } from '../types';
 import { categories, getCategoryLabel } from '../utils/categoryUtils';
 import ProductCard from '../components/ProductCard';
 import debounce from 'lodash/debounce';
+import { Link } from 'react-router-dom';
 
 const HomePage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -93,17 +94,38 @@ const HomePage: React.FC = () => {
       {featuredProducts.length > 0 && !isSearching && (
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Featured Products</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {featuredProducts.map((product) => (
-              <div key={product._id} className="relative">
-                <div className="absolute top-2 right-2 z-10">
-                  <span className="bg-yellow-400 text-white p-1 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
+              <div key={product._id} className="card hover:shadow-lg transition-shadow duration-200 relative">
+                {/* Featured badge */}
+                <div className="absolute top-2 right-2 z-10">                  <span className="inline-flex items-center px-2 py-1 rounded-full bg-yellow-400 text-white text-sm font-medium shadow-sm">
+                    Featured
                   </span>
                 </div>
-                <ProductCard product={product} showCategory />
+
+                {/* Product content */}
+                <Link to={`/products/${product._id}`} className="block">
+                  <div className="aspect-w-16 aspect-h-9">
+                    <img
+                      src={product.images[product.coverImageIndex]}
+                      alt={product.name}
+                      className="object-cover w-full h-48 rounded-t-lg"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                      {product.name}
+                    </h3>
+                    <div className="flex flex-col gap-2">
+                      <span className="text-sm text-gray-600">
+                        {getCategoryLabel(product.category)}
+                      </span>
+                      <span className="text-lg font-medium text-gray-900">
+                        MWK {product.price.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
               </div>
             ))}
           </div>

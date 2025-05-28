@@ -336,35 +336,29 @@ const AdminDashboard: React.FC = () => {
               ))
             )}
           </div>
-        ) : (          // Products list view
-          <div className="space-y-4">
+        ) : (
+          // Products grid view
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {products.filter(p => showReserved ? p.reserved : true).map((product) => (
-              <div key={product._id} className="flex items-center space-x-4 bg-white p-4 rounded-lg shadow">
-                <div className="relative flex-shrink-0">
+              <div key={product._id} className="card">
+                <div className="relative">
                   <img
                     src={product.images[product.coverImageIndex]}
                     alt={product.name}
-                    className="w-24 h-24 object-cover rounded"
-                  />                  {product.featured && (
-                    <span className="absolute top-0 left-0 bg-yellow-400 text-white px-2 py-1 rounded-br text-sm font-medium shadow-sm">
-                      Featured
+                    className="w-full h-48 object-cover rounded-t"
+                  />
+                  {product.featured && (
+                    <span className="absolute top-2 right-2 bg-yellow-400 text-white p-1 rounded-full">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
                     </span>
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-lg font-semibold truncate">{product.name}</h3>
-                      <div className="text-sm text-gray-600 mt-1">{getCategoryLabel(product.category)}</div>
-                      <div className="text-lg font-bold mt-1">MWK {product.price.toLocaleString()}</div>
-                      <div className="text-sm text-gray-600">{product.contactNumber}</div>
-                      {product.reserved && (
-                        <div className="text-sm mt-1">
-                          <span className="font-semibold">Reserved by:</span> {product.reservedBy?.phoneNumber}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center space-x-2 flex-shrink-0">
+                <div className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg font-semibold">{product.name}</h3>
+                    <div className="flex items-center space-x-2">
                       <button
                         onClick={() => handleToggleFeatured(product._id, product.featured)}
                         className={`p-1 rounded-full transition-colors ${
@@ -378,9 +372,10 @@ const AdminDashboard: React.FC = () => {
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
-                      </button>                      <button
+                      </button>
+                      <button
                         onClick={() => navigate(`/products/${product._id}/edit`)}
-                        className="px-3 py-1 text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 rounded"
+                        className="text-blue-600 hover:text-blue-900"
                       >
                         Edit
                       </button>
@@ -394,19 +389,27 @@ const AdminDashboard: React.FC = () => {
                               setError(handleApiError(err));
                             }
                           }}
-                          className="px-3 py-1 text-sm bg-yellow-50 text-yellow-600 hover:bg-yellow-100 rounded"
+                          className="text-yellow-600 hover:text-yellow-900"
                         >
                           Unreserve
                         </button>
                       )}
                       <button
                         onClick={() => handleDelete(product._id)}
-                        className="px-3 py-1 text-sm bg-red-50 text-red-600 hover:bg-red-100 rounded"
+                        className="text-red-600 hover:text-red-900"
                       >
                         Delete
                       </button>
                     </div>
                   </div>
+                  <div className="text-sm text-gray-600 mb-2">{getCategoryLabel(product.category)}</div>
+                  <div className="text-lg font-bold mb-2">MWK {product.price.toLocaleString()}</div>
+                  <div className="text-sm text-gray-600">{product.contactNumber}</div>
+                  {product.reserved && (
+                    <div className="mt-2 text-sm">
+                      <span className="font-semibold">Reserved by:</span> {product.reservedBy?.phoneNumber}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
