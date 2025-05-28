@@ -22,10 +22,30 @@ app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 // app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Database connection
+// Database connection with error handling
+mongoose.set('strictQuery', true);  // Handle deprecation warning
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.error('MongoDB connection error:', err));
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);  // Exit process with failure
+  });
+
+// Handle other MongoDB events
+mongoose.connection.on('error', err => {
+  console.error('MongoDB error after initial connection:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.warn('MongoDB disconnected');
+});
+
+process.on('SIGINT', () => {
+  mongoose.connection.close(() => {
+    console.log('MongoDB connection closed through app termination');
+    process.exit(0);
+  });
+});
 
 // Create first admin
 // const { createFirstAdmin } = require('./controllers/adminController');
