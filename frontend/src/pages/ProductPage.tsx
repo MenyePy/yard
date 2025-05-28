@@ -4,7 +4,7 @@ import { productsApi, handleApiError } from '../services/api';
 import { Product } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import ImageModal from '../components/ImageModal';
-import { getWhatsAppLink } from '../utils/phoneUtils';
+import { getWhatsAppLink, openProductPurchaseWhatsApp } from '../utils/phoneUtils';
 
 const ProductPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -53,15 +53,15 @@ const ProductPage: React.FC = () => {
       setSubmitting(true);
       await productsApi.reserve(product._id, phoneNumber);
       
-      // Construct WhatsApp message with product name
-      const message = encodeURIComponent(`Hello! I would like to buy ${product.name} from Afonne Market.`);
-      const whatsappLink = `https://wa.me/${product.contactNumber}?text=${message}`;
+      // Open WhatsApp with purchase message
+      openProductPurchaseWhatsApp({
+        name: product.name,
+        price: product.price,
+        contactNumber: product.contactNumber
+      });
       
       await fetchProduct();
       setPhoneNumber('');
-      
-      // Open WhatsApp in new tab
-      window.open(whatsappLink, '_blank');
       
       window.alert('Product marked as pending! We\'ve opened WhatsApp for you to contact the seller and arrange payment and delivery.');
     } catch (error) {

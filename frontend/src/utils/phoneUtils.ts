@@ -13,3 +13,21 @@ export const formatPhoneForWhatsApp = (phone: string): string => {
 export const getWhatsAppLink = (phone: string): string => {
   return `https://wa.me/${formatPhoneForWhatsApp(phone)}`;
 };
+
+export interface ProductPurchaseInfo {
+  name: string;
+  price: number;
+  contactNumber: string;
+}
+
+export const getProductPurchaseWhatsAppLink = (product: ProductPurchaseInfo): string => {
+  const message = encodeURIComponent(
+    `Hello! I would like to buy ${product.name} listed for MWK ${product.price.toLocaleString()} from Afonne Market.`
+  );
+  return `https://wa.me/${formatPhoneForWhatsApp(product.contactNumber)}?text=${message}`;
+};
+
+export const openProductPurchaseWhatsApp = (product: ProductPurchaseInfo): void => {
+  const whatsappLink = getProductPurchaseWhatsAppLink(product);
+  window.open(whatsappLink, '_blank');
+};
