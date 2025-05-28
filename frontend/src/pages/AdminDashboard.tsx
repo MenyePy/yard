@@ -348,7 +348,7 @@ const AdminDashboard: React.FC = () => {
                   />                  {product.featured && (
                     <span className="absolute top-0 left-0 bg-yellow-400 text-white px-2 py-1 rounded-br text-sm font-medium shadow-sm">
                       Featured
-                    </span>)}
+                    </span>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
