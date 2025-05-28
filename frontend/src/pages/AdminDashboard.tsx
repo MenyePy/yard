@@ -315,7 +315,7 @@ const AdminDashboard: React.FC = () => {
                       {offer.productName}
                     </h3>
                     <div className="text-sm text-gray-500">
-                      {offer.phoneNumber.substring(0, 4)}****
+                      {offer.phoneNumber}
                     </div>
                     <div className="text-sm text-gray-500">
                       {new Date(offer.timestamp).toLocaleDateString()} {new Date(offer.timestamp).toLocaleTimeString()}
