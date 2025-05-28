@@ -133,25 +133,39 @@ const HomePage: React.FC = () => {
 
       {/* Existing Header */}
       <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:justify-between sm:items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Welcome to Afonne Market
-        </h1>
-        
         <div className="flex flex-col sm:flex-row gap-4">
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="input-field"
-          />
+          <div className="flex flex-1">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="input-field pl-4 pr-12 py-2.5 w-full"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    debouncedSearch(searchQuery);
+                  }
+                }}
+              />
+              <button
+                onClick={() => debouncedSearch(searchQuery)}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-gray-500 hover:text-gray-700"
+                aria-label="Search"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+            </div>
+          </div>
           
           {!isSearching && (
             <>
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className="input-field"
+                className="input-field px-4 py-2.5"
               >
                 <option value="newest">Newest First</option>
                 <option value="oldest">Oldest First</option>
@@ -160,7 +174,7 @@ const HomePage: React.FC = () => {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="input-field"
+                className="input-field px-4 py-2.5"
               >
                 <option value="">All Categories</option>
                 {categories.map(cat => (

@@ -17,7 +17,7 @@ const TermsModal: React.FC<TermsModalProps> = ({ isOpen, onAccept }) => {
           <div className="prose prose-sm">
             <h3 className="text-lg font-semibold mb-2">1. Acceptance of Terms</h3>
             <p className="mb-4">
-              By accessing and using Afonne Market, you agree to be bound by these Terms and Conditions.
+              By accessing and using Menye's Market, you agree to be bound by these Terms and Conditions.
             </p>
 
             <h3 className="text-lg font-semibold mb-2">2. Product Listings</h3>
@@ -46,7 +46,7 @@ const TermsModal: React.FC<TermsModalProps> = ({ isOpen, onAccept }) => {
 
             <h3 className="text-lg font-semibold mb-2">6. Liability Limitations</h3>
             <p className="mb-4">
-              Afonne Market serves as a platform connecting buyers and sellers. We are not responsible for
+              Menye's Market serves as a platform connecting buyers and sellers. We are not responsible for
               the quality, safety, or legitimacy of listed items. Users engage in transactions at their own risk.
             </p>
 

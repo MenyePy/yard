@@ -20,9 +20,8 @@ export interface ProductPurchaseInfo {
   contactNumber: string;
 }
 
-export const getProductPurchaseWhatsAppLink = (product: ProductPurchaseInfo): string => {
-  const message = encodeURIComponent(
-    `Hello! I would like to buy ${product.name} listed for MWK ${product.price.toLocaleString()} from Afonne Market.`
+export const getProductPurchaseWhatsAppLink = (product: ProductPurchaseInfo): string => {  const message = encodeURIComponent(
+    `Hello! I would like to buy ${product.name} listed for MWK ${product.price.toLocaleString()} from Menye's Market.`
   );
   return `https://wa.me/${formatPhoneForWhatsApp(product.contactNumber)}?text=${message}`;
 };
